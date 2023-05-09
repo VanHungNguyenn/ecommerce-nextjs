@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import Spinner from './Spinner'
@@ -10,18 +10,27 @@ export default function ProductForm({
 	description: existingDescription,
 	price: existingPrice,
 	images: existingImages,
+	category: existingCategory,
 }) {
 	const [title, setTitle] = useState(existingTitle || '')
+	const [category, setCategory] = useState(existingCategory || '')
 	const [description, setDescription] = useState(existingDescription || '')
 	const [price, setPrice] = useState(existingPrice || '')
 	const [images, setImages] = useState(existingImages || [])
 	const [gotoProducts, setGotoProducts] = useState(false)
 	const [isUploading, setIsUploading] = useState(false)
+	const [categories, setCategories] = useState([])
 	const router = useRouter()
+
+	useEffect(() => {
+		axios.get('/api/categories').then((response) => {
+			setCategories(response.data)
+		})
+	}, [])
 
 	const createProduct = async (e) => {
 		e.preventDefault()
-		const data = { title, description, price, images }
+		const data = { title, description, price, images, category }
 		if (_id) {
 			//update
 			await axios.put(`/api/products`, { ...data, _id })
@@ -73,6 +82,20 @@ export default function ProductForm({
 				value={title}
 				onChange={(e) => setTitle(e.target.value)}
 			/>
+			<label htmlFor='category'>Category:</label>
+			<select
+				id='category'
+				value={category}
+				onChange={(e) => setCategory(e.target.value)}
+			>
+				<option value=''>Uncategorized</option>
+				{categories.length > 0 &&
+					categories.map((category) => (
+						<option key={category._id} value={category._id}>
+							{category.name}
+						</option>
+					))}
+			</select>
 			<label htmlFor='photo'>Product photos:</label>
 			<div className='mb-2 flex items-center gap-2'>
 				<ReactSortable

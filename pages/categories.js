@@ -1,9 +1,10 @@
 import Layout from '@/components/Layout'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { withSwal } from 'react-sweetalert2'
 
-export default function CategoriesPage() {
+const Categories = ({ swal }) => {
+	const [editedCategory, setEditedCategory] = useState(null)
 	const [name, setName] = useState('')
 	const [categories, setCategories] = useState([])
 	const [parentCategory, setParentCategory] = useState('')
@@ -20,18 +21,53 @@ export default function CategoriesPage() {
 	const saveCategory = async (e) => {
 		e.preventDefault()
 
-		await axios.post('/api/categories', { name, parentCategory })
+		const data = { name, parentCategory }
+
+		if (editedCategory) {
+			await axios.put(`/api/categories`, {
+				...data,
+				_id: editedCategory._id,
+			})
+
+			setEditedCategory(null)
+		} else {
+			await axios.post('/api/categories', data)
+		}
+
+		setParentCategory('0')
 		setName('')
 		getCategories()
 	}
 
-	const editCategory = async (id) => {}
-	const deleteCategory = async (id) => {}
+	const editCategory = async (category) => {
+		setEditedCategory(category)
+		setName(category.name)
+		setParentCategory(category.parent?._id || '0')
+	}
+	const deleteCategory = async (category) => {
+		const { isConfirmed } = await swal.fire({
+			title: 'Are you sure?',
+			text: `You are about to delete "${category.name}"`,
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'Yes, delete it!',
+			cancelButtonText: 'No, cancel!',
+		})
+
+		if (isConfirmed) {
+			await axios.delete(`/api/categories?id=${category._id}`)
+			getCategories()
+		}
+	}
 
 	return (
 		<Layout>
 			<h1>Categories</h1>
-			<label htmlFor='name'>New category name:</label>
+			<label htmlFor='name'>
+				{editedCategory
+					? `Edit category "${editedCategory.name}"`
+					: 'Create new category'}
+			</label>
 			<form onSubmit={saveCategory} className='flex gap-2'>
 				<input
 					className='mb-0'
@@ -46,7 +82,7 @@ export default function CategoriesPage() {
 					value={parentCategory}
 					onChange={(e) => setParentCategory(e.target.value)}
 				>
-					<option value='0'>No parent category</option>
+					<option value=''>No parent category</option>
 					{categories.length > 0 &&
 						categories.map((category) => (
 							<option key={category._id} value={category._id}>
@@ -75,9 +111,7 @@ export default function CategoriesPage() {
 								<td>
 									<button
 										className='button-default button-primary'
-										onClick={() =>
-											editCategory(category._id)
-										}
+										onClick={() => editCategory(category)}
 									>
 										<svg
 											xmlns='http://www.w3.org/2000/svg'
@@ -97,9 +131,7 @@ export default function CategoriesPage() {
 									</button>
 									<button
 										className='button-default button-primary'
-										onClick={() =>
-											deleteCategory(category._id)
-										}
+										onClick={() => deleteCategory(category)}
 									>
 										<svg
 											xmlns='http://www.w3.org/2000/svg'
@@ -125,3 +157,5 @@ export default function CategoriesPage() {
 		</Layout>
 	)
 }
+
+export default withSwal(({ swal }, ref) => <Categories swal={swal} />)
