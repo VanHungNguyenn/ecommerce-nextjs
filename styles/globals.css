@@ -19,6 +19,10 @@ textarea:focus {
   @apply border-blue-900;
 }
 
+img {
+  max-height: 100%;
+}
+
 h1 {
   @apply text-blue-900 mb-2 text-xl;
 }
@@ -44,5 +48,18 @@ table.basic tr td {
 }
 
 table.basic a {
-  @apply bg-blue-900 text-white text-sm py-1 px-2 rounded-md inline-flex items-center gap-1;
+  @apply bg-blue-900 text-white text-sm py-1 px-2 rounded-md inline-flex items-center gap-1 mr-1;
+}
+
+.btn-red,
+.btn-default {
+  @apply inline-block rounded-md px-4 py-1;
+}
+
+.btn-red {
+  @apply bg-red-800 text-white;
+}
+
+.btn-default {
+  @apply bg-gray-200;
 }
