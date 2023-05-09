@@ -10,12 +10,14 @@ body {
 }
 
 input,
-textarea {
+textarea,
+select {
   @apply border border-gray-300 rounded-md px-1 py-1 w-full mb-2;
 }
 
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   @apply border-blue-900;
 }
 
@@ -32,7 +34,7 @@ label {
 }
 
 .button-primary {
-  @apply bg-blue-900 text-white px-4 rounded-md py-1;
+  @apply bg-blue-900 text-white px-4 rounded-md py-1 inline-flex items-center gap-1 mr-1;
 }
 
 table.basic {

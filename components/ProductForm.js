@@ -19,8 +19,6 @@ export default function ProductForm({
 	const [isUploading, setIsUploading] = useState(false)
 	const router = useRouter()
 
-	console.log(images)
-
 	const createProduct = async (e) => {
 		e.preventDefault()
 		const data = { title, description, price, images }
