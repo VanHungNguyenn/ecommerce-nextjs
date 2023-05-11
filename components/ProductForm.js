@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useRouter } from 'next/router'
 import Spinner from './Spinner'
 import { ReactSortable } from 'react-sortablejs'
+import { set } from 'mongoose'
 
 export default function ProductForm({
 	_id,
@@ -14,6 +15,7 @@ export default function ProductForm({
 }) {
 	const [title, setTitle] = useState(existingTitle || '')
 	const [category, setCategory] = useState(existingCategory || '')
+	const [productProperties, setProductProperties] = useState({})
 	const [description, setDescription] = useState(existingDescription || '')
 	const [price, setPrice] = useState(existingPrice || '')
 	const [images, setImages] = useState(existingImages || [])
@@ -72,11 +74,31 @@ export default function ProductForm({
 		setImages(images)
 	}
 
-	const properties = []
+	const propertiestoFill = []
+	console.log(propertiestoFill)
 
 	if (categories.length > 0 && category) {
-		const selCatInfo = categories.find((cat) => cat._id === category)
-		console.log({ selCatInfo })
+		let catInfo = categories.find((cat) => cat._id === category)
+		console.log(catInfo)
+
+		propertiestoFill.push(...catInfo.properties)
+
+		while (catInfo?.parent?._id) {
+			const parentCat = categories.find(
+				(cat) => cat._id === catInfo.parent._id
+			)
+
+			propertiestoFill.push(...parentCat.properties)
+			catInfo = parentCat
+		}
+	}
+
+	const setProductProp = (propName, propValue) => {
+		setProductProperties((oldProps) => {
+			const newProductProps = { ...oldProps }
+			newProductProps[propName] = propValue
+			return newProductProps
+		})
 	}
 
 	return (
@@ -103,9 +125,25 @@ export default function ProductForm({
 						</option>
 					))}
 			</select>
-			{categories.length > 0 && category?.properties?.length > 0 && (
-				<div></div>
-			)}
+			{propertiestoFill.length > 0 &&
+				propertiestoFill.map((prop) => (
+					<div key={prop._id} className='flex gap-1 items-center'>
+						<div>{prop.name}</div>
+						<select
+							onChange={(e) =>
+								setProductProp(prop.name, e.target.value)
+							}
+							value={productProperties[prop.name]}
+							className='mb-0'
+						>
+							{prop.values.map((val) => (
+								<option key={val} value={val}>
+									{val}
+								</option>
+							))}
+						</select>
+					</div>
+				))}
 			<label htmlFor='photo'>Product photos:</label>
 			<div className='mb-2 flex items-center gap-2'>
 				<ReactSortable
