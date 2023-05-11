@@ -12,10 +12,13 @@ export default function ProductForm({
 	price: existingPrice,
 	images: existingImages,
 	category: existingCategory,
+	properties: existingProperties,
 }) {
 	const [title, setTitle] = useState(existingTitle || '')
 	const [category, setCategory] = useState(existingCategory || '')
-	const [productProperties, setProductProperties] = useState({})
+	const [productProperties, setProductProperties] = useState(
+		existingProperties || {}
+	)
 	const [description, setDescription] = useState(existingDescription || '')
 	const [price, setPrice] = useState(existingPrice || '')
 	const [images, setImages] = useState(existingImages || [])
@@ -32,7 +35,14 @@ export default function ProductForm({
 
 	const createProduct = async (e) => {
 		e.preventDefault()
-		const data = { title, description, price, images, category }
+		const data = {
+			title,
+			description,
+			price,
+			images,
+			category,
+			productProperties,
+		}
 		if (_id) {
 			//update
 			await axios.put(`/api/products`, { ...data, _id })
@@ -127,8 +137,11 @@ export default function ProductForm({
 			</select>
 			{propertiestoFill.length > 0 &&
 				propertiestoFill.map((prop) => (
-					<div key={prop._id} className='flex gap-1 items-center'>
-						<div>{prop.name}</div>
+					<div
+						key={prop._id}
+						className='flex gap-1 items-center mb-2'
+					>
+						<div className='capitalize'>{prop.name}</div>
 						<select
 							onChange={(e) =>
 								setProductProp(prop.name, e.target.value)
