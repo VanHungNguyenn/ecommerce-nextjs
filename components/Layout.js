@@ -6,7 +6,6 @@ import Logo from './Logo'
 export default function Layout({ children }) {
 	const [showNav, setShowNav] = useState(false)
 	const { data: session } = useSession()
-	console.log({ showNav })
 
 	if (!session) {
 		return (

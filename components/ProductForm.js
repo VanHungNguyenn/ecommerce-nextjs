@@ -85,11 +85,9 @@ export default function ProductForm({
 	}
 
 	const propertiestoFill = []
-	console.log(propertiestoFill)
 
 	if (categories.length > 0 && category) {
 		let catInfo = categories.find((cat) => cat._id === category)
-		console.log(catInfo)
 
 		propertiestoFill.push(...catInfo.properties)
 

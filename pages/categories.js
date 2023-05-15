@@ -11,8 +11,6 @@ const Categories = ({ swal }) => {
 	const [parentCategory, setParentCategory] = useState('')
 	const [properties, setProperties] = useState([])
 
-	console.log(properties)
-
 	const getCategories = async () => {
 		const { data: categories } = await axios.get('/api/categories')
 		setCategories(categories)
